@@ -3,7 +3,7 @@
 const pageResults = require('graph-results-pager')
 
 const graphAPIEndpoints = {
-  bento: 'https://api.thegraph.com/subgraphs/name/clearwood/bento',
+  bento: 'https://api.thegraph.com/subgraphs/name/jiro-ono/bento-trial',
 }
 
 module.exports = {
@@ -18,54 +18,82 @@ module.exports = {
           properties: [
             'id',
             'lendingPairsCount',
-            'tokens { id, totalShare, totalAmount, block, timestamp }',
-            'withdrawals { id, from { id }, to, token { id }, amount, share, block, timestamp }',
-            'deposits { id, from { id }, to { id }, token { id }, amount, share, block, timestamp }',
-            'flashloans { id, user { id }, token { id }, amount, feeAmount, block, timestamp }'
+            'lendingPairs { id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }',
+            'tokens { id, totalSupply, block, timestamp }',
+            'withdrawals { id, from { id }, to, token { id, totalSupply, block, timestamp }, amount, block, timestamp }',
+            'deposits { id, from { id }, to { id }, token { id, totalSupply, block, timestamp }, amount, block, timestamp }',
           ]
         }
       })
-        .then(([{ id, lendingPairsCount, tokens, withdrawals, deposits, flashloans }]) =>
-          ({
+        .then(results =>
+          results.map(({ id, lendingPairsCount, lendingPairs, tokens, withdrawals, deposits }) => ({
             id: id,
             lendingPairsCount: Number(lendingPairsCount),
-            tokens: tokens.map(({ id, totalShare, totalAmount, block, timestamp }) => ({
+            lendingPairs: lendingPairs.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }) => ({
               id: id,
-              totalShare: Number(totalShare),
-              totalAmount: Number(totalAmount),
+              asset: asset,
+              borrowOpeningFee: Number(borrowOpeningFee),
+              closedCollaterizationRate: Number(closedCollaterizationRate),
+              collateral: Number(collateral),
+              decimals: Number(decimals),
+              dev: dev,
+              devFee: Number(devFee),
+              exchangeRate: Number(exchangeRate),
+              feeTo: feeTo,
+              feesPendingAmount: Number(feesPendingAmount),
+              interestElasticity: Number(interestElasticity),
+              interestPerBlock: Number(interestPerBlock),
+              lastBlockAccrued: Number(lastBlockAccrued),
+              liquidationMultiplier: Number(liquidationMultiplier),
+              masterContract: masterContract,
+              maximumInterestPerBlock: Number(maximumInterestPerBlock),
+              maximumTargetUtilization: Number(maximumTargetUtilization),
+              name: name,
+              openCollaterizationRate: Number(openCollaterizationRate),
+              oracle: oracle,
+              owner: owner,
+              pendingOwner: pendingOwner,
+              protocolFee: Number(protocolFee),
+              startingInterestPerBlock: Number(startingInterestPerBlock),
+              symbol: symbol,
+              totalAssetAmount: Number(totalAssetAmount),
+              totalAssetFraction: Number(totalAssetFraction),
+              totalBorrowFraction: Number(totalBorrowFraction),
+              totalBorrowAmount: Number(totalBorrowAmount),
+              totalCollateralAmount: Number(totalCollateralAmount),
+              utilization: Number(utilization),
               block: Number(block),
               timestamp: Number(timestamp)
             })),
-            withdrawals: withdrawals.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+            tokens: tokens.map(({ id, totalSupply, block, timestamp }) => ({
+              id: id,
+              totalSupply: Number(totalSupply),
+              block: Number(block),
+              timestamp: Number(timestamp)
+            })),
+            withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to,
               token: token.id,
+              tokenTotalSupply: Number(token.totalSupply),
+              tokenBlock: Number(token.block),
+              tokenTimestamp: Number(token.timestamp),
               amount: Number(amount),
               share: Number(share),
               block: Number(block),
               timestamp: Number(timestamp)
             })),
-            deposits: deposits.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+            deposits: deposits.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to.id,
               token: token.id,
               amount: Number(amount),
-              share: Number(share),
-              block: Number(block),
-              timestamp: Number(timestamp)
-            })),
-            flashloans: flashloans.map(({ id, user, token, amount, feeAmount, block, timestamp }) => ({
-              id: id,
-              user: user.id,
-              token: token.id,
-              amount: Number(amount),
-              feeAmount: Number(feeAmount),
               block: Number(block),
               timestamp: Number(timestamp)
             }))
-          })
+          }))
         )
         .catch(err => console.error(err))
     },
@@ -109,7 +137,7 @@ module.exports = {
             'devFee',
             'exchangeRate',
             'feeTo',
-            'feesPendingShare',
+            'feesPendingAmount',
             'interestElasticity',
             'interestPerBlock',
             'lastBlockAccrued',
@@ -127,20 +155,21 @@ module.exports = {
             'protocolFee',
             'startingInterestPerBlock',
             'symbol',
-            'totalAssetShare',
+            'totalAssetAmount',
+            'totalAssetFraction',
             'totalBorrowFraction',
-            'totalBorrowShare',
-            'totalCollateralShare',
-            'totalSupply',
+            'totalBorrowAmount',
+            'totalCollateralAmount',
             'utilization',
             'block',
             'timestamp',
-            'transactions { id, type, lendingPair, token { id }, amount, share, fraction, poolPercentage, block, timestamp  }'
+            // TODO: let's take this transaction away from here, and add a function for single pair fetches and then include tx data in that
+            'transactions { id, type, token { id, totalSupply }, amount, fraction, poolPercentage, block, timestamp  }'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingShare, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, minimumInterestPerBlock, minimumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetShare, totalBorrowFraction,    totalBorrowShare, totalCollateralShare, totalSupply, utilization, block, timestamp, transactions }) => ({
+          results.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, minimumInterestPerBlock, minimumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp, transactions }) => ({
             id: id,
             asset: asset,
             borrowOpeningFee: Number(borrowOpeningFee),
@@ -151,7 +180,7 @@ module.exports = {
             devFee: Number(devFee),
             exchangeRate: Number(exchangeRate),
             feeTo: feeTo,
-            feesPendingShare: Number(feesPendingShare),
+            feesPendingAmount: Number(feesPendingAmount),
             interestElasticity: Number(interestElasticity),
             interestPerBlock: Number(interestPerBlock),
             lastBlockAccrued: Number(lastBlockAccrued),
@@ -167,53 +196,25 @@ module.exports = {
             protocolFee: Number(protocolFee),
             startingInterestPerBlock: Number(startingInterestPerBlock),
             symbol: symbol,
-            totalAssetShare: Number(totalAssetShare),
-            totalBorrowFraction: Number(totalBorrowFraction),
-            totalCollateralShare: Number(totalCollateralShare),
-            totalSupply: Number(totalSupply),
+            totalAssetAmount: Number(totalAssetAmount),
+            totalAssetFraction: Number(totalAssetFraction),
+            totalBorowFraction: Number(totalBorrowFraction),
+            totalBorrowAmount: Number(totalBorrowAmount),
+            totalCollateralAmount: Number(totalCollateralAmount),
             utilization: Number(utilization),
             block: Number(block),
             timestamp: Number(timestamp),
-            transactions: transactions.map(({ id, type, amount, share, fraction, poolPercentage, block, timestamp }) => ({
+            transactions: transactions.map(({ id, type, token, amount, fraction, poolPercentage, block, timestamp }) => ({
               id: id,
               type: type,
+              token: token.id,
+              tokenTotalSupply: Number(tokenTotalSupply),
               amount: Number(amount),
-              share: Number(share),
               fraction: Number(fraction),
               poolPercentage: Number(poolPercentage),
               block: Number(block),
               timestamp: Number(timestamp)
             }))
-          }))
-        )
-        .catch(err => console.error(err))
-    },
-
-    flashLoans() {
-      return pageResults({
-        api: graphAPIEndpoints.bento,
-        query: {
-          entity: 'flashLoans',
-          properties: [
-            'id',
-            'user { id }',
-            'token { id }',
-            'amount',
-            'feeAmount',
-            'block',
-            'timestamp'
-          ]
-        }
-      })
-        .then(results =>
-          results.map(({ id, user, token, amount, feeAmount, block, timestamp }) => ({
-            id: id,
-            user: user.id,
-            token: token.id,
-            amount: Number(amount),
-            feeAmount: Number(feeAmount),
-            block: Number(block),
-            timestamp: Number(timestamp)
           }))
         )
         .catch(err => console.error(err))
@@ -228,22 +229,21 @@ module.exports = {
             'id',
             'from { id }',
             'to { id }',
-            'token { id }',
+            'token { id, totalSupply }',
             'amount',
-            'share',
             'block',
             'timestamp'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+          results.map(({ id, from, to, token, amount, block, timestamp }) => ({
             id: id,
             from: from.id,
             to: to.id,
             token: token.id,
+            tokenTotalSupply: Number(token.totalSupply),
             amount: Number(amount),
-            share: Number(share),
             block: Number(block),
             timestamp: Number(timestamp)
           }))
@@ -260,22 +260,21 @@ module.exports = {
             'id',
             'from { id }',
             'to',
-            'token { id }',
+            'token { id, totalSupply }',
             'amount',
-            'share',
             'block',
             'timestamp'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+          results.map(({ id, from, to, token, amount, block, timestamp }) => ({
             id: id,
             from: from.id,
             to: to,
             token: token.id,
+            tokenTotalSupply: Number(token.totalSupply),
             amount: Number(amount),
-            share: share,
             block: Number(block),
             timestamp: Number(timestamp)
           }))
@@ -290,18 +289,16 @@ module.exports = {
           entity: 'tokens',
           properties: [
             'id',
-            'totalShare',
-            'totalAmount',
+            'totalSupply',
             'block',
             'timestamp'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, totalShare, totalAmount, block, timestamp }) => ({
+          results.map(({ id, totalSupply, block, timestamp }) => ({
             id: id,
-            totalShare: Number(totalShare),
-            totalAmount: Number(totalAmount),
+            totalSupply: Number(totalSupply),
             block: Number(block),
             timestamp: Number(timestamp)
           }))
@@ -309,85 +306,75 @@ module.exports = {
         .catch(err => console.error(err))
     },
 
-    userInfo({ user = undefined }) {
+    userInfo(user) {
+      let where = user ? { id: `\\"${user.toLowerCase()}\\"` } : {}
       return pageResults({
         api: graphAPIEndpoints.bento,
         query: {
           entity: 'users',
           selection: {
-            where: {
-              id: user ? `\\"${user.toLowerCase()}\\"` : undefined,
-            }
+            where
           },
           properties: [
             'id',
-            'lendingPairs { id, lendingPair { id, asset }, userCollateralShare, balanceOf, userBorrowFraction, transactions { id, type, lendingPair { id, asset }, token { id }, amount, share, fraction, poolPercentage, block, timestamp } }',
-            'bentoData { id, token { id, totalShare, totalAmount }, share }',
-            'withdrawals { id, from { id }, to, token { id }, amount, share, block, timestamp }',
-            'deposits { id, from { id }, to { id }, token { id }, amount, share, block, timestamp }',
-            'flashloans { id, token { id }, amount, feeAmount, block, timestamp }',
+            'lendingPairs { id, lendingPair { id, asset }, userCollateralAmount, balanceOf, userBorrowFraction, transactions { id, type, lendingPair { id, asset }, token { id, totalSupply }, amount, fraction, poolPercentage, block, timestamp } }',
+            'bentoData { id, token { id, totalSupply }, amount }',
+            'withdrawals { id, from { id }, to, token { id, totalSupply }, amount, block, timestamp }',
+            'deposits { id, from { id }, to { id }, token { id, totalSupply }, amount, block, timestamp }',
             'block',
             'timestamp'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, lendingPairs, bentoData, withdrawals, deposits, flashloans, block, timestamp }) => ({
+          results.map(({ id, lendingPairs, bentoData, withdrawals, deposits, block, timestamp }) => ({
             id: id,
-            leandingPairs: lendingPairs.map(({ id, lendingPair, userCollateralShare, balanceOf, userBorrowFraction, transactions }) => ({
-              userLendingPairId: id,
+            leandingPairs: lendingPairs.map(({ id, lendingPair, userCollateralAmount, balanceOf, userBorrowFraction, transactions }) => ({
+              id: id,
               lendingPairId: lendingPair.id,
-              asset: asset,
-              userCollateralShare: Number(userCollateralShare),
+              lendingPairAsset: lendingPair.asset,
+              userCollateralAmount: Number(userCollateralAmount),
               balanceOf: Number(balanceOf),
               userBorrowFraction: Number(userBorrowFraction),
-              transactions: transactions.map(({ id, type, lendingPair, token, amount, share, fraction, poolPercentage, block, timestamp }) => ({
+              transactions: transactions.map(({ id, type, lendingPair, token, amount, fraction, poolPercentage, block, timestamp }) => ({
                 id: id,
                 type: type,
                 lendingPairId: lendingPair.id,
                 lendingPairAsset: lendingPair.asset,
                 token: token.id,
+                tokenTotalSupply: Number(token.totalSupply),
                 amount: Number(amount),
-                share: Number(share),
                 fraction: Number(fraction),
                 poolPercentage: Number(poolPercentage),
                 block: Number(block),
                 timestamp: Number(timestamp)
               }))
             })),
-            bentoData: bentoData.map(({ id, token, share }) => ({
+            bentoData: bentoData.map(({ id, token, amount }) => ({
               id: id,
               tokenId: id,
-              tokenTotalShare: Number(token.totalShare),
-              tokenTotalAmount: Number(token.totalAmount),
-              share: Number(share)
+              tokenTotalSupply: Number(token.totalSupply),
+              amount: Number(amount)
             })),
-            withdrawals: withdrawals.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+            withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to,
+              token: token.id,
+              tokenTotalSupply: Number(token.totalSupply),
               amount: Number(amount),
-              share: Number(share),
               block: Number(block),
               timestamp: Number(timestamp)
             })),
-            deposits: deposits.map(({ id, from, to, token, amount, share, block, timestamp }) => ({
+            deposits: deposits.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to.id,
               token: token.id,
+              tokenTotalSupply: Number(token.totalSupply),
               amount: Number(amount),
-              share: Number(share),
               block: Number(block),
               timestamp: Number(timestamp)
-            })),
-            flashloans: flashloans.map(({ id, token, amount, feeAmount, block, timestamp }) => ({
-                id: id,
-                token: token.id,
-                amount: Number(amount),
-                feeAmount: Number(feeAmount),
-                block: Number(block),
-                timestamp: Number(timestamp)
             })),
             block: block,
             timestamp: timestamp
@@ -397,11 +384,14 @@ module.exports = {
     },
 
     userBentoTokenData({ user = undefined, token = undefined }) {
+      // TODO: add where variable here
       return pageResults({
         api: graphAPIEndpoints.bento,
         query: {
           entity: 'userBentoTokenDatas',
           selection: {
+            orderBy: 'amount',
+            orderDirection: 'desc',
             where: {
               id: user && token ?  `\\"${user.toLowerCase()}-${token.toLowerCase()}\\"` : undefined,
             }
@@ -409,21 +399,20 @@ module.exports = {
           properties: [
             'id',
             'owner { id }',
-            'token { id, totalShare, totalAmount, block, timestamp }',
-            'share'
+            'token { id, totalSupply, block, timestamp }',
+            'amount'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, owner, token, share }) => ({
+          results.map(({ id, owner, token, amount }) => ({
             id: id,
             user: owner.id,
             token: token.id,
-            tokenTotalShare: Number(token.totalShare),
-            tokenTotalAmount: Number(token.totalAmount),
+            tokenTotalSupply: Number(token.totalSupply),
             tokenLastBlock: Number(token.block),
             tokenLastTimestamp: Number(token.timestamp),
-            userShare: Number(share)
+            amount: Number(amount)
           }))
         )
         .catch(err => console.error(err))
