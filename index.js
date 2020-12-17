@@ -1,7 +1,7 @@
 'use strict';
 
 const pageResults = require('graph-results-pager')
-const ethers = require('ethers');
+const ethers = require('ethers')
 
 const graphAPIEndpoints = {
   bento: 'https://api.thegraph.com/subgraphs/name/jiro-ono/bento-trial',
