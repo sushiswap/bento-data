@@ -4,7 +4,7 @@ const pageResults = require('graph-results-pager')
 const ethers = require('ethers')
 
 const graphAPIEndpoints = {
-  bento: 'https://api.thegraph.com/subgraphs/name/jiro-ono/bento-trial',
+  bento: 'https://api.thegraph.com/subgraphs/name/jiro-ono/bento-trial-staging',
 }
 
 module.exports = {
@@ -19,10 +19,10 @@ module.exports = {
           properties: [
             'id',
             'lendingPairsCount',
-            'lendingPairs { id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }',
-            'tokens { id, totalSupply, block, timestamp }',
-            'withdrawals { id, from { id }, to, token { id, totalSupply, block, timestamp }, amount, block, timestamp }',
-            'deposits { id, from { id }, to { id }, token { id, totalSupply, block, timestamp }, amount, block, timestamp }',
+            'lendingPairs { id, asset { id, totalSupply, name, symbol, decimals }, borrowOpeningFee, closedCollaterizationRate, collateral { id, totalSupply, name, symbol, decimals }, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }',
+            'tokens { id, totalSupply, name, symbol, decimals, block, timestamp }',
+            'withdrawals { id, from { id }, to { id }, token { id, totalSupply, name, symbol, decimals, block, timestamp }, amount, block, timestamp }',
+            'deposits { id, from { id }, to { id }, token { id, totalSupply, name, symbol, decimals, block, timestamp }, amount, block, timestamp }',
           ]
         }
       })
@@ -32,10 +32,18 @@ module.exports = {
             lendingPairsCount: ethers.BigNumber.from(lendingPairsCount),
             lendingPairs: lendingPairs.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }) => ({
               id: id,
-              asset: asset,
+              asset: asset.id,
+              assetTotalSupply: ethers.BigNumber.from(asset.totalSupply),
+              assetName: asset.name,
+              assetSymbol: asset.symbol,
+              assetDecimals: ethers.BigNumber.from(asset.decimals),
               borrowOpeningFee: ethers.BigNumber.from(borrowOpeningFee),
               closedCollaterizationRate: ethers.BigNumber.from(closedCollaterizationRate),
-              collateral: collateral,
+              collateral: collateral.id,
+              collateralTotalSupply: ethers.BigNumber.from(collateral.totalSupply),
+              collateralName: collateral.name,
+              collateralSymbol: collateral.symbol,
+              collateralDecimals: ethers.BigNumber.from(collateral.decimals),
               decimals: ethers.BigNumber.from(decimals),
               dev: dev,
               devFee: ethers.BigNumber.from(devFee),
@@ -66,22 +74,27 @@ module.exports = {
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
             })),
-            tokens: tokens.map(({ id, totalSupply, block, timestamp }) => ({
+            tokens: tokens.map(({ id, totalSupply, name, symbol, decimals, block, timestamp }) => ({
               id: id,
               totalSupply: ethers.BigNumber.from(totalSupply),
+              name: name,
+              symbol: symbol,
+              decimals: ethers.BigNumber.from(decimals),
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
             })),
             withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
-              to: to,
+              to: to.id,
               token: token.id,
               tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              tokenName: token.name,
+              tokenSymbol: token.symbol,
+              tokenDecimals: ethers.BigNumber.from(token.decimals),
               tokenBlock: ethers.BigNumber.from(token.block),
               tokenTimestamp: ethers.BigNumber.from(token.timestamp),
               amount: ethers.BigNumber.from(amount),
-              share: ethers.BigNumber.from(share),
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
             })),
@@ -90,6 +103,12 @@ module.exports = {
               from: from.id,
               to: to.id,
               token: token.id,
+              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              tokenName: token.name,
+              tokenSymbol: token.symbol,
+              tokenDecimals: ethers.BigNumber.from(token.decimals),
+              tokenBlock: ethers.BigNumber.from(token.block),
+              tokenTimestamp: ethers.BigNumber.from(token.timestamp),
               amount: ethers.BigNumber.from(amount),
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
@@ -129,10 +148,10 @@ module.exports = {
           entity: 'lendingPairs',
           properties: [
             'id',
-            'asset',
+            'asset { id, bentoBox { id }, totalSupply, name, symbol, decimals }',
             'borrowOpeningFee',
             'closedCollaterizationRate',
-            'collateral',
+            'collateral { id, bentoBox { id }, totalSupply, name, symbol, decimals }',
             'decimals',
             'dev',
             'devFee',
@@ -230,7 +249,7 @@ module.exports = {
             'id',
             'from { id }',
             'to { id }',
-            'token { id, totalSupply }',
+            'token { id, bentoBox { id }, totalSupply, name, symbol, decimals }',
             'amount',
             'block',
             'timestamp'
@@ -243,7 +262,11 @@ module.exports = {
             from: from.id,
             to: to.id,
             token: token.id,
+            tokenBentoBox: token.bentoBox.id,
             tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            tokenName: token.name,
+            tokenSymbol: token.symbol,
+            tokenDecimals: token.decimals,
             amount: ethers.BigNumber.from(amount),
             block: ethers.BigNumber.from(block),
             timestamp: ethers.BigNumber.from(timestamp)
@@ -261,7 +284,7 @@ module.exports = {
             'id',
             'from { id }',
             'to',
-            'token { id, totalSupply }',
+            'token { id, bentoBox { id }, totalSupply, name, symbol, decimals }',
             'amount',
             'block',
             'timestamp'
@@ -274,7 +297,11 @@ module.exports = {
             from: from.id,
             to: to,
             token: token.id,
+            tokenBentoBox: token.bentoBox.id,
             tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            tokenName: token.name,
+            tokenSymbol: token.symbol,
+            tokenDecimals: token.decimals,
             amount: ethers.BigNumber.from(amount),
             block: ethers.BigNumber.from(block),
             timestamp: ethers.BigNumber.from(timestamp)
@@ -290,16 +317,24 @@ module.exports = {
           entity: 'tokens',
           properties: [
             'id',
+            'bentoBox { id }',
             'totalSupply',
+            'name',
+            'symbol',
+            'decimals',
             'block',
             'timestamp'
           ]
         }
       })
         .then(results =>
-          results.map(({ id, totalSupply, block, timestamp }) => ({
+          results.map(({ id, bentoBox, totalSupply, name, symbol, decimals, block, timestamp }) => ({
             id: id,
+            bentoBox: bentoBox.id,
             totalSupply: ethers.BigNumber.from(totalSupply),
+            name: name,
+            symbol: symbol,
+            decimals: decimals,
             block: ethers.BigNumber.from(block),
             timestamp: ethers.BigNumber.from(timestamp)
           }))
@@ -318,10 +353,10 @@ module.exports = {
           },
           properties: [
             'id',
-            'lendingPairs { id, lendingPair { id, asset }, userCollateralAmount, balanceOf, userBorrowFraction, transactions { id, type, lendingPair { id, asset }, token { id, totalSupply }, amount, fraction, poolPercentage, block, timestamp } }',
-            'bentoData { id, token { id, totalSupply }, amount }',
-            'withdrawals { id, from { id }, to, token { id, totalSupply }, amount, block, timestamp }',
-            'deposits { id, from { id }, to { id }, token { id, totalSupply }, amount, block, timestamp }',
+            'lendingPairs { id, lendingPair { id }, userCollateralAmount, balanceOf, userBorrowFraction, transactions { id, type, lendingPair { id }, token { id }, amount, fraction, poolPercentage, block, timestamp } }',
+            'bentoData { id, token { id }, amount }',
+            'withdrawals { id, from { id }, to { id }, token { id, bentoBox { id }, totalSupply, name, symbol, decimals }, amount, block, timestamp }',
+            'deposits { id, from { id }, to { id }, token { id, bentoBox { id }, totalSupply, name, symbol, decimals }, amount, block, timestamp }',
             'block',
             'timestamp'
           ]
@@ -333,7 +368,6 @@ module.exports = {
             leandingPairs: lendingPairs.map(({ id, lendingPair, userCollateralAmount, balanceOf, userBorrowFraction, transactions }) => ({
               id: id,
               lendingPairId: lendingPair.id,
-              lendingPairAsset: lendingPair.asset,
               userCollateralAmount: ethers.BigNumber.from(userCollateralAmount),
               balanceOf: Number(balanceOf),
               userBorrowFraction: ethers.BigNumber.from(userBorrowFraction),
@@ -341,9 +375,7 @@ module.exports = {
                 id: id,
                 type: type,
                 lendingPairId: lendingPair.id,
-                lendingPairAsset: lendingPair.asset,
                 token: token.id,
-                tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
                 amount: ethers.BigNumber.from(amount),
                 fraction: ethers.BigNumber.from(fraction),
                 poolPercentage: ethers.BigNumber.from(poolPercentage),
@@ -354,15 +386,18 @@ module.exports = {
             bentoData: bentoData.map(({ id, token, amount }) => ({
               id: id,
               tokenId: id,
-              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
               amount: ethers.BigNumber.from(amount)
             })),
             withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
-              to: to,
+              to: to.id,
               token: token.id,
+              tokenBentoBox: token.bentoBox.id,
               tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              tokenName: token.name,
+              tokenSymbol: token.symbol,
+              tokenDecimals: token.decimals,
               amount: ethers.BigNumber.from(amount),
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
@@ -372,7 +407,11 @@ module.exports = {
               from: from.id,
               to: to.id,
               token: token.id,
+              tokenBentoBox: token.bentoBox.id,
               tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              tokenName: token.name,
+              tokenSymbol: token.symbol,
+              tokenDecimals: token.decimals,
               amount: ethers.BigNumber.from(amount),
               block: ethers.BigNumber.from(block),
               timestamp: ethers.BigNumber.from(timestamp)
@@ -400,7 +439,7 @@ module.exports = {
           properties: [
             'id',
             'owner { id }',
-            'token { id, totalSupply, block, timestamp }',
+            'token { id, bentoBox { id }, totalSupply, name, symbol, decimals, block, timestamp }',
             'amount'
           ]
         }
@@ -410,7 +449,11 @@ module.exports = {
             id: id,
             user: owner.id,
             token: token.id,
+            tokenBentoBox: token.bentoBox.id,
             tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            tokenName: token.name,
+            tokenSymbol: token.symbol,
+            tokenDecimals: token.decimals,
             tokenLastBlock: ethers.BigNumber.from(token.block),
             tokenLastTimestamp: ethers.BigNumber.from(token.timestamp),
             amount: ethers.BigNumber.from(amount)
