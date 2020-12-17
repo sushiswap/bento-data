@@ -1,6 +1,7 @@
 'use strict';
 
 const pageResults = require('graph-results-pager')
+const ethers = require('ethers');
 
 const graphAPIEndpoints = {
   bento: 'https://api.thegraph.com/subgraphs/name/jiro-ono/bento-trial',
@@ -28,70 +29,70 @@ module.exports = {
         .then(results =>
           results.map(({ id, lendingPairsCount, lendingPairs, tokens, withdrawals, deposits }) => ({
             id: id,
-            lendingPairsCount: Number(lendingPairsCount),
+            lendingPairsCount: ethers.BigNumber.from(lendingPairsCount),
             lendingPairs: lendingPairs.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp }) => ({
               id: id,
               asset: asset,
-              borrowOpeningFee: Number(borrowOpeningFee),
-              closedCollaterizationRate: Number(closedCollaterizationRate),
-              collateral: Number(collateral),
-              decimals: Number(decimals),
+              borrowOpeningFee: ethers.BigNumber.from(borrowOpeningFee),
+              closedCollaterizationRate: ethers.BigNumber.from(closedCollaterizationRate),
+              collateral: collateral,
+              decimals: ethers.BigNumber.from(decimals),
               dev: dev,
-              devFee: Number(devFee),
-              exchangeRate: Number(exchangeRate),
+              devFee: ethers.BigNumber.from(devFee),
+              exchangeRate: ethers.BigNumber.from(exchangeRate),
               feeTo: feeTo,
-              feesPendingAmount: Number(feesPendingAmount),
-              interestElasticity: Number(interestElasticity),
-              interestPerBlock: Number(interestPerBlock),
-              lastBlockAccrued: Number(lastBlockAccrued),
-              liquidationMultiplier: Number(liquidationMultiplier),
+              feesPendingAmount: ethers.BigNumber.from(feesPendingAmount),
+              interestElasticity: ethers.BigNumber.from(interestElasticity),
+              interestPerBlock: ethers.BigNumber.from(interestPerBlock),
+              lastBlockAccrued: ethers.BigNumber.from(lastBlockAccrued),
+              liquidationMultiplier: ethers.BigNumber.from(liquidationMultiplier),
               masterContract: masterContract,
-              maximumInterestPerBlock: Number(maximumInterestPerBlock),
-              maximumTargetUtilization: Number(maximumTargetUtilization),
+              maximumInterestPerBlock: ethers.BigNumber.from(maximumInterestPerBlock),
+              maximumTargetUtilization: ethers.BigNumber.from(maximumTargetUtilization),
               name: name,
-              openCollaterizationRate: Number(openCollaterizationRate),
+              openCollaterizationRate: ethers.BigNumber.from(openCollaterizationRate),
               oracle: oracle,
               owner: owner,
               pendingOwner: pendingOwner,
-              protocolFee: Number(protocolFee),
-              startingInterestPerBlock: Number(startingInterestPerBlock),
+              protocolFee: ethers.BigNumber.from(protocolFee),
+              startingInterestPerBlock: ethers.BigNumber.from(startingInterestPerBlock),
               symbol: symbol,
-              totalAssetAmount: Number(totalAssetAmount),
-              totalAssetFraction: Number(totalAssetFraction),
-              totalBorrowFraction: Number(totalBorrowFraction),
-              totalBorrowAmount: Number(totalBorrowAmount),
-              totalCollateralAmount: Number(totalCollateralAmount),
-              utilization: Number(utilization),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              totalAssetAmount: ethers.BigNumber.from(totalAssetAmount),
+              totalAssetFraction: ethers.BigNumber.from(totalAssetFraction),
+              totalBorrowFraction: ethers.BigNumber.from(totalBorrowFraction),
+              totalBorrowAmount: ethers.BigNumber.from(totalBorrowAmount),
+              totalCollateralAmount: ethers.BigNumber.from(totalCollateralAmount),
+              utilization: ethers.BigNumber.from(utilization),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             })),
             tokens: tokens.map(({ id, totalSupply, block, timestamp }) => ({
               id: id,
-              totalSupply: Number(totalSupply),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              totalSupply: ethers.BigNumber.from(totalSupply),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             })),
             withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to,
               token: token.id,
-              tokenTotalSupply: Number(token.totalSupply),
-              tokenBlock: Number(token.block),
-              tokenTimestamp: Number(token.timestamp),
-              amount: Number(amount),
-              share: Number(share),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              tokenBlock: ethers.BigNumber.from(token.block),
+              tokenTimestamp: ethers.BigNumber.from(token.timestamp),
+              amount: ethers.BigNumber.from(amount),
+              share: ethers.BigNumber.from(share),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             })),
             deposits: deposits.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to.id,
               token: token.id,
-              amount: Number(amount),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              amount: ethers.BigNumber.from(amount),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             }))
           }))
         )
@@ -172,48 +173,48 @@ module.exports = {
           results.map(({ id, asset, borrowOpeningFee, closedCollaterizationRate, collateral, decimals, dev, devFee, exchangeRate, feeTo, feesPendingAmount, interestElasticity, interestPerBlock, lastBlockAccrued, liquidationMultiplier, masterContract, maximumInterestPerBlock, maximumTargetUtilization, minimumInterestPerBlock, minimumTargetUtilization, name, openCollaterizationRate, oracle, owner, pendingOwner, protocolFee, startingInterestPerBlock, symbol, totalAssetAmount, totalAssetFraction, totalBorrowFraction, totalBorrowAmount, totalCollateralAmount, utilization, block, timestamp, transactions }) => ({
             id: id,
             asset: asset,
-            borrowOpeningFee: Number(borrowOpeningFee),
-            closedCollaterizationRate: Number(closedCollaterizationRate),
-            collateral: Number(collateral),
-            decimals: Number(decimals),
+            borrowOpeningFee: ethers.BigNumber.from(borrowOpeningFee),
+            closedCollaterizationRate: ethers.BigNumber.from(closedCollaterizationRate),
+            collateral: collateral,
+            decimals: ethers.BigNumber.from(decimals),
             dev: dev,
-            devFee: Number(devFee),
-            exchangeRate: Number(exchangeRate),
+            devFee: ethers.BigNumber.from(devFee),
+            exchangeRate: ethers.BigNumber.from(exchangeRate),
             feeTo: feeTo,
-            feesPendingAmount: Number(feesPendingAmount),
-            interestElasticity: Number(interestElasticity),
-            interestPerBlock: Number(interestPerBlock),
-            lastBlockAccrued: Number(lastBlockAccrued),
-            liquidationMultiplier: Number(liquidationMultiplier),
+            feesPendingAmount: ethers.BigNumber.from(feesPendingAmount),
+            interestElasticity: ethers.BigNumber.from(interestElasticity),
+            interestPerBlock: ethers.BigNumber.from(interestPerBlock),
+            lastBlockAccrued: ethers.BigNumber.from(lastBlockAccrued),
+            liquidationMultiplier: ethers.BigNumber.from(liquidationMultiplier),
             masterContract: masterContract,
-            maximumInterestPerBlock: Number(maximumInterestPerBlock),
-            maximumTargetUtilization: Number(maximumTargetUtilization),
+            maximumInterestPerBlock: ethers.BigNumber.from(maximumInterestPerBlock),
+            maximumTargetUtilization: ethers.BigNumber.from(maximumTargetUtilization),
             name: name,
-            openCollaterizationRate: Number(openCollaterizationRate),
+            openCollaterizationRate: ethers.BigNumber.from(openCollaterizationRate),
             oracle: oracle,
             owner: owner,
             pendingOwner: pendingOwner,
-            protocolFee: Number(protocolFee),
-            startingInterestPerBlock: Number(startingInterestPerBlock),
+            protocolFee: ethers.BigNumber.from(protocolFee),
+            startingInterestPerBlock: ethers.BigNumber.from(startingInterestPerBlock),
             symbol: symbol,
-            totalAssetAmount: Number(totalAssetAmount),
-            totalAssetFraction: Number(totalAssetFraction),
-            totalBorowFraction: Number(totalBorrowFraction),
-            totalBorrowAmount: Number(totalBorrowAmount),
-            totalCollateralAmount: Number(totalCollateralAmount),
-            utilization: Number(utilization),
-            block: Number(block),
-            timestamp: Number(timestamp),
+            totalAssetAmount: ethers.BigNumber.from(totalAssetAmount),
+            totalAssetFraction: ethers.BigNumber.from(totalAssetFraction),
+            totalBorowFraction: ethers.BigNumber.from(totalBorrowFraction),
+            totalBorrowAmount: ethers.BigNumber.from(totalBorrowAmount),
+            totalCollateralAmount: ethers.BigNumber.from(totalCollateralAmount),
+            utilization: ethers.BigNumber.from(utilization),
+            block: ethers.BigNumber.from(block),
+            timestamp: ethers.BigNumber.from(timestamp),
             transactions: transactions.map(({ id, type, token, amount, fraction, poolPercentage, block, timestamp }) => ({
               id: id,
               type: type,
               token: token.id,
-              tokenTotalSupply: Number(tokenTotalSupply),
-              amount: Number(amount),
-              fraction: Number(fraction),
-              poolPercentage: Number(poolPercentage),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              tokenTotalSupply: ethers.BigNumber.from(tokenTotalSupply),
+              amount: ethers.BigNumber.from(amount),
+              fraction: ethers.BigNumber.from(fraction),
+              poolPercentage: ethers.BigNumber.from(poolPercentage),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             }))
           }))
         )
@@ -242,10 +243,10 @@ module.exports = {
             from: from.id,
             to: to.id,
             token: token.id,
-            tokenTotalSupply: Number(token.totalSupply),
-            amount: Number(amount),
-            block: Number(block),
-            timestamp: Number(timestamp)
+            tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            amount: ethers.BigNumber.from(amount),
+            block: ethers.BigNumber.from(block),
+            timestamp: ethers.BigNumber.from(timestamp)
           }))
         )
         .catch(err => console.error(err))
@@ -273,10 +274,10 @@ module.exports = {
             from: from.id,
             to: to,
             token: token.id,
-            tokenTotalSupply: Number(token.totalSupply),
-            amount: Number(amount),
-            block: Number(block),
-            timestamp: Number(timestamp)
+            tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            amount: ethers.BigNumber.from(amount),
+            block: ethers.BigNumber.from(block),
+            timestamp: ethers.BigNumber.from(timestamp)
           }))
         )
         .catch(err => console.error(err))
@@ -298,9 +299,9 @@ module.exports = {
         .then(results =>
           results.map(({ id, totalSupply, block, timestamp }) => ({
             id: id,
-            totalSupply: Number(totalSupply),
-            block: Number(block),
-            timestamp: Number(timestamp)
+            totalSupply: ethers.BigNumber.from(totalSupply),
+            block: ethers.BigNumber.from(block),
+            timestamp: ethers.BigNumber.from(timestamp)
           }))
         )
         .catch(err => console.error(err))
@@ -333,48 +334,48 @@ module.exports = {
               id: id,
               lendingPairId: lendingPair.id,
               lendingPairAsset: lendingPair.asset,
-              userCollateralAmount: Number(userCollateralAmount),
+              userCollateralAmount: ethers.BigNumber.from(userCollateralAmount),
               balanceOf: Number(balanceOf),
-              userBorrowFraction: Number(userBorrowFraction),
+              userBorrowFraction: ethers.BigNumber.from(userBorrowFraction),
               transactions: transactions.map(({ id, type, lendingPair, token, amount, fraction, poolPercentage, block, timestamp }) => ({
                 id: id,
                 type: type,
                 lendingPairId: lendingPair.id,
                 lendingPairAsset: lendingPair.asset,
                 token: token.id,
-                tokenTotalSupply: Number(token.totalSupply),
-                amount: Number(amount),
-                fraction: Number(fraction),
-                poolPercentage: Number(poolPercentage),
-                block: Number(block),
-                timestamp: Number(timestamp)
+                tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+                amount: ethers.BigNumber.from(amount),
+                fraction: ethers.BigNumber.from(fraction),
+                poolPercentage: ethers.BigNumber.from(poolPercentage),
+                block: ethers.BigNumber.from(block),
+                timestamp: ethers.BigNumber.from(timestamp)
               }))
             })),
             bentoData: bentoData.map(({ id, token, amount }) => ({
               id: id,
               tokenId: id,
-              tokenTotalSupply: Number(token.totalSupply),
-              amount: Number(amount)
+              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              amount: ethers.BigNumber.from(amount)
             })),
             withdrawals: withdrawals.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to,
               token: token.id,
-              tokenTotalSupply: Number(token.totalSupply),
-              amount: Number(amount),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              amount: ethers.BigNumber.from(amount),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             })),
             deposits: deposits.map(({ id, from, to, token, amount, block, timestamp }) => ({
               id: id,
               from: from.id,
               to: to.id,
               token: token.id,
-              tokenTotalSupply: Number(token.totalSupply),
-              amount: Number(amount),
-              block: Number(block),
-              timestamp: Number(timestamp)
+              tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+              amount: ethers.BigNumber.from(amount),
+              block: ethers.BigNumber.from(block),
+              timestamp: ethers.BigNumber.from(timestamp)
             })),
             block: block,
             timestamp: timestamp
@@ -409,10 +410,10 @@ module.exports = {
             id: id,
             user: owner.id,
             token: token.id,
-            tokenTotalSupply: Number(token.totalSupply),
-            tokenLastBlock: Number(token.block),
-            tokenLastTimestamp: Number(token.timestamp),
-            amount: Number(amount)
+            tokenTotalSupply: ethers.BigNumber.from(token.totalSupply),
+            tokenLastBlock: ethers.BigNumber.from(token.block),
+            tokenLastTimestamp: ethers.BigNumber.from(token.timestamp),
+            amount: ethers.BigNumber.from(amount)
           }))
         )
         .catch(err => console.error(err))

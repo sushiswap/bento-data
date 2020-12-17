@@ -12,6 +12,7 @@
 	"dependencies": {
 		"commander": "6.1.0",
 		"csv-stringify": "5.3.3",
+		"ethers": "5.0.7",
 		"graph-results-pager": "~1.0.0",
 		"graphql": "14.5.8",
 		"moment": "~2.24.0",
