@@ -3,6 +3,7 @@
 ## Current Queries Supported
 
 ```javascript
+import bentoData from '@sushiswap/bento-data';
 
 bentoData.bento
     .info()
